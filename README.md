@@ -3,7 +3,8 @@ Interactive analysis of repeat elements
 
 **Installation**
 ```R
-install_github("niccw/repeatCraft")
+if (!require(remotes)) { install.packages("remotes") }
+remotes::install_github("niccw/repeatCraft")
 ```
 
 **Run repeatCraft from R**
