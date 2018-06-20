@@ -2,30 +2,30 @@ Package: repeatcraft
 Type: Package
 Title: Interactive analysis of repeat elements
 Version: 0.1.0
-URL:
 Author: Wai Yee Wong
 Maintainer:  Wai Yee Wong <nicolawongwaiyee@gmail.com>
 Description: Shiny apps for repetitive element de-fragmentation and visualise annotation
 biocViews:
-Imports:
     Biostrings,
-    dplyr,
-    DT,
+    TnT,
     GenomicFeatures,
     GenomicRanges,
+    rtracklayer,
+    systemPipeR
+Imports:
+    dplyr,
+    DT,
+    ggplot2,
     TnT,
     magrittr,
     plotly,
     readr,
     reshape2,
-    rtracklayer,
     shiny,
     shinyjs,
     shinythemes,
-    stringr,
-    systemPipeR
+    stringr
 License: MIT
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
-Built: R 3.4.4; ; 2018-06-20 12:12:26 UTC; unix

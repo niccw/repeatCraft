@@ -47,7 +47,7 @@ mapc <-function(uniV){
 
 
 # Run Temerger  ---------------------------------------------
-scriptdir <- system.file("pythonScript", package = "repeatcraft")
+scriptdir <- paste0(system.file("pythonScript", package = "repeatcraft"),"/")
 
 # tmp files path
 parsedgff <<- tempfile()
@@ -138,7 +138,7 @@ getseq <- function(fa,chromName,rstart,rend,repeatfamily){
 
   targetseq <- paste(targetseq[2:length(targetseq)], collapse = "")
   repeatseq <- substr(targetseq,rstart,rend)
-  targetDNAstring <<- DNAStringSet(repeatseq)
+  targetDNAstring <<- Biostrings::DNAStringSet(repeatseq)
   names(targetDNAstring) <<- repeatfamily
 }
 
@@ -148,7 +148,7 @@ findorf <- function(fa,chromName,rstart,rend,repeatfamily,orfN){
 
   targetseq <- paste(targetseq[2:length(targetseq)], collapse = "")
   repeatseq <- Biostrings::substr(targetseq,rstart,rend)
-  targetDNAstring <- DNAStringSet(repeatseq)
+  targetDNAstring <- Biostrings::DNAStringSet(repeatseq)
   names(targetDNAstring) <<- repeatfamily
 
   orfResult <- as.data.frame(systemPipeR::predORF(targetDNAstring, n=orfN, mode="orf", longest_disjoint=TRUE, strand="both"))

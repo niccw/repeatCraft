@@ -7,14 +7,17 @@
 #    http://shiny.rstudio.com/
 #
 
-#' @import shinyjs
+#' @import shiny Biostrings DT GenomicFeatures GenomicRanges TnT dplyr magrittr plotly readr reshape2 rtracklayer shinythemes stringr
+#' @importFrom shinyjs hidden
+NULL
+
 # Define UI for application that draws a histogram
-shinyUI(fluidPage(theme=shinytheme("yeti"),
+shinyUI(fluidPage(theme=shinythemes::shinytheme("yeti"),
 
   navbarPage("repeatCraft",
     # 1st tab panel
     tabPanel("General",
-             useShinyjs(),
+             shinyjs::useShinyjs(),
       sidebarPanel(width=3,
         selectInput("sampleset","Sample Data:",c("Hydra magnipappilata"," "),selected = " ", multiple = FALSE),
         hr(),
@@ -51,9 +54,9 @@ shinyUI(fluidPage(theme=shinytheme("yeti"),
           tabsetPanel(
             tabPanel("Pie chart",
               fluidRow(checkboxInput("pieUnknown", label = "Include Unknown", value = TRUE)),
-              fluidRow(plotlyOutput("rePie"))
+              fluidRow(plotly::plotlyOutput("rePie"))
             ),
-            tabPanel("Bar chart",plotlyOutput("reBar",height=700))
+            tabPanel("Bar chart",plotly::plotlyOutput("reBar",height=700))
           )
         )
     ),
@@ -64,7 +67,7 @@ shinyUI(fluidPage(theme=shinytheme("yeti"),
              ),
              fluidRow(
                column(4,DT::DTOutput("ageDT")),
-               column(8,plotlyOutput("ageBar",height = 500))
+               column(8,plotly::plotlyOutput("ageBar",height = 500))
              )
              ),
 
@@ -116,7 +119,7 @@ shinyUI(fluidPage(theme=shinytheme("yeti"),
           # plot option
         ),
         mainPanel(width=9,
-                  TnTOutput("tntplot",width = "auto",height = "90%")
+                  TnT::TnTOutput("tntplot",width = "auto",height = "90%")
         )
           )
     ),
@@ -133,7 +136,7 @@ shinyUI(fluidPage(theme=shinytheme("yeti"),
                       tabsetPanel(type="tabs",
                                   tabPanel("Viewer",
                                            fluidRow(fileInput("genegff","Gene Annotation (.gff)",multiple=FALSE,accept = c(".gff"))),
-                                           fluidRow(TnTOutput("rpplot"))),
+                                           fluidRow(TnT::TnTOutput("rpplot"))),
                                   tabPanel("ORFs",
                                            fluidRow(column(6,fileInput("orfFa","Genome (.fa/.fasta)",multiple = FALSE,accept = c(".fa",".fasta"))),
                                                     column(4,numericInput("orfn","Max. number of ORFs to return",value=10,min=1))
@@ -142,7 +145,7 @@ shinyUI(fluidPage(theme=shinytheme("yeti"),
                                                     column(4,downloadButton("downloadorf","Download Result (.tsv)")),
                                                     column(4,downloadButton("downloadfa","Fasta"))),
                                            #fluidRow(DT::dataTableOutput("orfdf")),
-                                           fluidRow(TnTOutput("orftnt"))
+                                           fluidRow(TnT::TnTOutput("orftnt"))
                                            )
 
                       ))
@@ -150,4 +153,3 @@ shinyUI(fluidPage(theme=shinytheme("yeti"),
     )
   )
 ))
-

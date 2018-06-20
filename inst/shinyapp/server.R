@@ -7,6 +7,9 @@
 #    http://shiny.rstudio.com/
 #
 
+require(magrittr)
+require(ggplot2)
+
 shinyServer(function(input, output,session) {
 
 
@@ -20,11 +23,11 @@ NULL
     checksample <- reactive({
         if(input$sampleset == "Hydra magnipappilata"){
         # read gff to GRanges
-          tegff <<- import.gff(tegff_p)
-          ltrgff <<- import.gff(ltrgff_p)
-          sgff <<- import.gff(sgff_p)
-          rmgff <<- import.gff(rmgff_p)
-          rmout <<- read_table2(rmout_p,col_names = FALSE,skip = 3)
+          tegff <<- rtracklayer::import.gff(tegff_p)
+          ltrgff <<- rtracklayer::import.gff(ltrgff_p)
+          sgff <<- rtracklayer::import.gff(sgff_p)
+          rmgff <<- rtracklayer::import.gff(rmgff_p)
+          rmout <<- readr::read_table2(rmout_p,col_names = FALSE,skip = 3)
           LTRlabel(TRUE)
         }
     })
@@ -55,7 +58,7 @@ NULL
           print(input$rmgffu$datapath)
           temergewrap(input$rmgffu$datapath,input$rmoutu$datapath,ltrgffp,input$shortsize,input$gapsize,input$maxltrsize,input$ltrflanksize,input$mergeltr)
 
-          rmout <<- read_table2(input$rmoutu$datapath,col_names = FALSE,skip = 3)
+          rmout <<- readr::read_table2(input$rmoutu$datapath,col_names = FALSE,skip = 3)
 
           # Optional file
           if (!is.null(input$tegffu)){
@@ -91,7 +94,7 @@ NULL
 
       print("before parsing rmgff")
       # Parse rmgff -------------------------------------------------------------------
-      if("LTRgroup" %in% colnames(mcols(rmgff))){
+      if("LTRgroup" %in% colnames(rtracklayer::mcols(rmgff))){
         rmgff$LTRgroup[sapply(rmgff$LTRgroup, function(x) length(x)==0)] <- NA # todo: find a better way to flat compressed list object
         # parse row with more than one label, prevent unconsistant length after unlist
         parsemultiple <-function(r){
@@ -111,7 +114,7 @@ NULL
 
       # rmgff to dataframe for datatable output
       gff <<- as.data.frame(rmgff)
-      gff <- mutate(gff,size = end-start)
+      gff <- dplyr::mutate(gff,size = end-start)
       if(LTRlabel()){
         gffdf <<- gff[,c("seqnames","type","start","end","strand","ID","TEgroup","LTRgroup","shortTE","size")]
       }else{
@@ -193,8 +196,10 @@ NULL
     # start and end depend on chrom
     chromsize <- reactive({
       validate(need(exists("rmgff"),""))
-      tail(end(rmgff[seqnames(rmgff)==input$pchrom]),1)
+      tail(end(rmgff[GenomicRanges::seqnames(rmgff)==input$pchrom]),1)
     })
+    
+    
 
     output$plotstart <- renderUI({
       validate(need(exists("rmgff"),""))
@@ -244,7 +249,7 @@ NULL
       classdfre()
       family <- classdf[input$rptable_rows_selected,1]
       subdf <- gff[gff$ID == family,c("seqnames","start","end","Tstart","Tend")]
-      subdf <- mutate(subdf,csize = as.integer(Tend)-as.integer(Tstart))
+      subdf <- dplyr::mutate(subdf,csize = as.integer(Tend)-as.integer(Tstart))
       subdf <<- subdf[base::rev(base::order(subdf$csize)),c("seqnames","start","end","csize")]
     })
 
@@ -278,7 +283,7 @@ NULL
       getseq(input$orfFa$datapath,pchrom,pstart,pend,rfamily)
 
       # Find ORF
-      orfdf <<- as.data.frame(predORF(targetDNAstring, n=input$orfn, mode="orf", longest_disjoint=TRUE, strand="both"))
+      orfdf <<- as.data.frame(systemPipeR::predORF(targetDNAstring, n=input$orfn, mode="orf", longest_disjoint=TRUE, strand="both"))
     })
 
 
@@ -309,7 +314,7 @@ NULL
     # Outputs -----------------------------------------------------------------
 
     # outputs in general
-    output$rePie <- renderPlotly({
+    output$rePie <- plotly::renderPlotly({
 
       parsefile()
 
@@ -322,15 +327,15 @@ NULL
         t2 <- gsub("$",";",gff$t)
       }
 
-      typetable <- str_extract(t2,".*?(?=/|;)") %>% table() %>% as.data.frame()
+      typetable <- stringr::str_extract(t2,".*?(?=/|;)") %>% table() %>% as.data.frame()
       colnames(typetable) <- c("Class","Count")
 
-      plot_ly(data = typetable, labels = ~`Class`, values= ~Count,type="pie",textposition = "inside",
+      plotly::plot_ly(data = typetable, labels = ~`Class`, values= ~Count,type="pie",textposition = "inside",
                    textinfo = "label+percent" )
 
     })
 
-    output$reBar <- renderPlotly({
+    output$reBar <- plotly::renderPlotly({
 
       parsefile()
       validate(need(exists("rmgff"),"Please select sample data / upload files"))
@@ -338,8 +343,8 @@ NULL
       subrmout <- rmout[,c("X2","X11")]
 
       subrmout$X11 <- gsub("$",";",subrmout$X11)
-      subrmout$X11 <- str_extract(subrmout$X11,".*?(?=/|;)")
-      plot_ly(subrmout,x=~X2,type="histogram",alpha=0.7,color=~X11, xbins=list(start=0,end=round(max(subrmout$X2)), size =0.5)) %>% layout(barmode="stack",xaxis=list(title="percentage of div."), yaxis =list(title="count"))
+      subrmout$X11 <- stringr::str_extract(subrmout$X11,".*?(?=/|;)")
+      plotly::plot_ly(subrmout,x=~X2,type="histogram",alpha=0.7,color=~X11, xbins=list(start=0,end=round(max(subrmout$X2)), size =0.5)) %>% plotly::layout(barmode="stack",xaxis=list(title="percentage of div."), yaxis =list(title="count"))
 
     })
 
@@ -365,32 +370,29 @@ NULL
         }
       }
 
-      print(tableattr)
-
-
       # Filter step by step
       if(input$chrom != "All"){
-        gffdf <- filter(gffdf, seqnames == input$chrom)
+        gffdf <- dplyr::filter(gffdf, seqnames == input$chrom)
       }
       if(input$repeattype != "All"){
-        gffdf <- filter(gffdf,type == input$repeattype)
+        gffdf <- dplyr::filter(gffdf,type == input$repeattype)
       }
 
 
-      gffdf <- filter(gffdf,size >= input$minsize)
-      gffdf <- filter(gffdf,size <= input$maxsize)
+      gffdf <- dplyr::filter(gffdf,size >= input$minsize)
+      gffdf <- dplyr::filter(gffdf,size <= input$maxsize)
 
       if(input$shortte == FALSE){
-        gffdf <- filter(gffdf,shortTE == "F")
+        gffdf <- dplyr::filter(gffdf,shortTE == "F")
       }
       if(tableattr == 1){
-        gffdf <- filter(gffdf,!is.na(LTRgroup))
+        gffdf <- dplyr::filter(gffdf,!is.na(LTRgroup))
       }
       if(tableattr == 3){
-        gffdf <- filter(gffdf,!is.na(TEgroup))
+        gffdf <- dplyr::filter(gffdf,!is.na(TEgroup))
       }
       if(tableattr == 4){
-        gffdf <- filter(gffdf, ((!is.na(LTRgroup)) & (!is.na(TEgroup))))
+        gffdf <- dplyr::filter(gffdf, ((!is.na(LTRgroup)) & (!is.na(TEgroup))))
       }
 
     # print datatable
@@ -398,7 +400,7 @@ NULL
     })
 
     # output in regionplot
-    output$tntplot <- renderTnT({
+    output$tntplot <- TnT::renderTnT({
 
 
       validate(need(exists("rmgff"),"Please select sample data / upload files"))
@@ -443,7 +445,7 @@ NULL
         # Only show track with TE
         trackls <<- c()
         checkrecord <- function(gff,tk){
-          if (length(gff[seqnames(gff)==input$pchrom & rtracklayer::start(gff) >= input$pstart & rtracklayer::end(gff)<= input$pend]) >= 1){
+          if (length(gff[GenomicRanges::seqnames(gff)==input$pchrom & rtracklayer::start(gff) >= input$pstart & rtracklayer::end(gff)<= input$pend]) >= 1){
             trackls <<- c(trackls,tk)
           }
         }
@@ -452,6 +454,7 @@ NULL
           checkrecord(rmgff_nounknown,rmftrack_nounknown)
         }else{
           checkrecord(rmgff,rmftrack)
+          
         }
 
         if(!is.null(tegff)){
@@ -470,7 +473,7 @@ NULL
           return()
         }
 
-        TnT::TnTGenome(trackls,view.range = GRanges(input$pchrom, IRanges((input$pstart)+200,(input$pend)+200)) )
+        TnT::TnTGenome(trackls,view.range = GenomicRanges::GRanges(input$pchrom, IRanges::IRanges((input$pstart)+200,(input$pend)+200)) )
       })
     })
 
@@ -492,7 +495,7 @@ NULL
       DT::datatable(subdf,selection = "single",extensions = "Scroller",rownames=FALSE,options = list(searching = FALSE,scrollY = 500,scroller = TRUE))
     })
 
-    output$rpplot <- renderTnT({
+    output$rpplot <- TnT::renderTnT({
 
       validate(need(exists("rmgff"),"Please select sample data / upload files"))
 
@@ -503,7 +506,7 @@ NULL
       pchrom <- subdf$seqnames[input$membertable_rows_selected]
       pstart <- subdf$start[input$membertable_rows_selected]
       pend <- subdf$end[input$membertable_rows_selected]
-      TnT::TnTGenome(rmftrack,view.range = GRanges(pchrom, IRanges((pstart)-1000,(pend)+1000)) )
+      TnT::TnTGenome(rmftrack,view.range = GenomicRanges::GRanges(pchrom, IRanges::IRanges((pstart)-1000,(pend)+1000)) )
     })
 
     output$orfdf<- DT::renderDataTable({
@@ -529,7 +532,7 @@ NULL
       })
     })
 
-    output$orftnt <- renderTnT({
+    output$orftnt <- TnT::renderTnT({
       validate(need(exists("rmgff"),"Please select sample data / upload files"))
 
       input$orfGo
@@ -562,12 +565,12 @@ NULL
         norfdf2 <- orfdf[(orfdf$strand == "-") & (orfdf$inframe2end==2),]
         norfdf3 <- orfdf[(orfdf$strand == "-") & (orfdf$inframe2end==3),]
 
-        p1 <- makeGRangesFromDataFrame(porfdf1,keep.extra.columns = FALSE)
-        p2 <- makeGRangesFromDataFrame(porfdf2,keep.extra.columns = FALSE)
-        p3 <- makeGRangesFromDataFrame(porfdf3,keep.extra.columns = FALSE)
-        n1 <- makeGRangesFromDataFrame(norfdf1,keep.extra.columns = FALSE)
-        n2 <- makeGRangesFromDataFrame(norfdf2,keep.extra.columns = FALSE)
-        n3 <- makeGRangesFromDataFrame(norfdf3,keep.extra.columns = FALSE)
+        p1 <- GenomicRanges::makeGRangesFromDataFrame(porfdf1,keep.extra.columns = FALSE)
+        p2 <- GenomicRanges::makeGRangesFromDataFrame(porfdf2,keep.extra.columns = FALSE)
+        p3 <- GenomicRanges::makeGRangesFromDataFrame(porfdf3,keep.extra.columns = FALSE)
+        n1 <- GenomicRanges::makeGRangesFromDataFrame(norfdf1,keep.extra.columns = FALSE)
+        n2 <- GenomicRanges::makeGRangesFromDataFrame(norfdf2,keep.extra.columns = FALSE)
+        n3 <- GenomicRanges::makeGRangesFromDataFrame(norfdf3,keep.extra.columns = FALSE)
 
         p1t <- TnT::FeatureTrack(p1,tooltip = as.data.frame(p1),color="red")
         p2t <- TnT::FeatureTrack(p2,tooltip = as.data.frame(p2),color="orange")
@@ -588,7 +591,7 @@ NULL
           }
         }
 
-        TnT::TnTGenome(trackls,view.range = GRanges(pchrom, IRanges((pstart-200),(pend+200))))
+        TnT::TnTGenome(trackls,view.range = GRanges(pchrom, IRanges::IRanges((pstart-200),(pend+200))))
       })
     })
 
@@ -604,7 +607,7 @@ NULL
       DT::datatable(ageclassdf,selection = "single", rownames = FALSE,extensions = "Scroller",options = list(scrollY = 500,scroller = TRUE))
     })
 
-    output$ageBar <- renderPlotly({
+    output$ageBar <- plotly::renderPlotly({
 
       validate(need(exists("rmgff"),"Please select sample data / upload files"))
 
@@ -614,9 +617,9 @@ NULL
       ageclassre()
       f <- ageclassdf$Family[input$ageDT_rows_selected]
       testdf <- rmout[rmout$X10 == f ,"X2"]
-      p <- ggplot(testdf,aes(X2)) + geom_histogram(color="#337175",fill="#00AFBB",bins = round(max(testdf)*2)) +
-        scale_x_continuous(breaks =  pretty(testdf$X2,n=max(testdf$X2/2))) + xlab("percentage of div.") + ggtitle(as.character(f))+theme_classic()
-      ggplotly(p)
+      p <- ggplot2::ggplot(testdf,aes(X2)) + ggplot2::geom_histogram(color="#337175",fill="#00AFBB",bins = round(max(testdf)*2)) +
+        ggplot2::scale_x_continuous(breaks =  pretty(testdf$X2,n=max(testdf$X2/2))) + ggplot2::xlab("percentage of div.") + ggplot2::ggtitle(as.character(f))+ ggplot2::theme_classic()
+      plotly::ggplotly()
     })
 
 
@@ -629,7 +632,7 @@ NULL
     output$downloadgff <- downloadHandler(
       filename = "TEmerger.gff",
       content = function(file){
-        export.gff3(rmgff,file,"")
+        rtracklayer::export.gff3(rmgff,file,"")
       }
     )
 
@@ -649,7 +652,7 @@ NULL
         paste0(filechrom(),"_",filestart(),"_",fileend(),".fa")
       },
       content = function(file){
-        writeFasta(targetDNAstring,file,width=60)  #targetDNAstring can be called here?
+        tigger::writeFasta(targetDNAstring,file,width=60) 
       }
     )
 

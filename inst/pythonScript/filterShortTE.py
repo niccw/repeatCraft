@@ -69,8 +69,6 @@ with open(gff,"r") as f:
 		next(f)
 	for line in f:
 		col = line.rstrip().split("\t")
-		if col[2] == "Unknown": # ignore unknown
-			continue
 		generalClass = col[2].split("/")[0]
 		teSize = int(col[4]) - int(col[3])
 		if teSize < m[generalClass]:
