@@ -1,0 +1,9 @@
+{
+    "path" : "~/repeatcraft",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}
