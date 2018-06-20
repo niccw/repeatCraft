@@ -7,9 +7,9 @@ NULL
 
 #' @export
 runApp <- function() {
-  exampleDir <- system.file("shinyapp/exampleData", package = "repeatcraft")
+  exampleDir <- system.file("shinyapp", package = "repeatcraft")
   if (exampleDir == "") {
-    stop("Could not find example directory. Try re-installing `repeatcraft`.", call. = FALSE)
+    stop("Could not find app directory. Try re-installing `repeatcraft`.", call. = FALSE)
   }
 
   appDir <- system.file("shinyapp",package = "repeatcraft")
