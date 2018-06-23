@@ -20,11 +20,11 @@ Imports:
     shinythemes,
     stringr,
     Biostrings,
-    GenomicFeatures (>= 1.30.0),
-    GenomicRanges (>= 1.30.0),
-    rtracklayer (>= 1.38.0),
-    systemPipeR (>= 1.12.0)
+    GenomicFeatures,
+    GenomicRanges,
+    rtracklayer,
+    systemPipeR
 License: MIT
 Encoding: UTF-8
-LazyData: true
+LazyData: TRUE
 RoxygenNote: 6.0.1
