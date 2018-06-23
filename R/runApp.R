@@ -1,6 +1,7 @@
 require(shiny)
 
-#' @import shiny Biostrings DT GenomicFeatures GenomicRanges dplyr magrittr plotly readr reshape2 rtracklayer shinythemes stringr GenomeInfoDb
+#' @import shiny Biostrings DT dplyr magrittr plotly readr reshape2 rtracklayer shinythemes stringr
+#' @importFrom GenomicRanges seqnames GRanges makeGRangesFromDataFrame
 #' @importFrom shinyjs hidden
 #' @importFrom systemPipeR predORF
 NULL
