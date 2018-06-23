@@ -6,7 +6,7 @@ Author: Wai Yee Wong
 Maintainer:  Wai Yee Wong <nicolawongwaiyee@gmail.com>
 Description: Shiny apps for repetitive element de-fragmentation and annotation visualization
 Depends: R (>= 3.4.0)
-biocViews: Infrastructure, Visualization, AnnotationData
+biocViews: Infrastructure, Visualization, FunctionalAnnotation
 Imports:
     dplyr,
     DT,
