@@ -20,7 +20,6 @@ Imports:
     shinythemes,
     stringr,
     Biostrings (>= 2.46.0),
-    TnT (>= 1.2.0),
     GenomicFeatures (>= 1.30.0),
     GenomicRanges (>= 1.30.0),
     rtracklayer (>= 1.38.0),
