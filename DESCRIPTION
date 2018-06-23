@@ -19,7 +19,7 @@ Imports:
     shinyjs,
     shinythemes,
     stringr,
-    Biostrings (>= 2.46.0),
+    Biostrings,
     GenomicFeatures (>= 1.30.0),
     GenomicRanges (>= 1.30.0),
     rtracklayer (>= 1.38.0),
