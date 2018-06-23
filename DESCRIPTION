@@ -6,13 +6,7 @@ Author: Wai Yee Wong
 Maintainer:  Wai Yee Wong <nicolawongwaiyee@gmail.com>
 Description: Shiny apps for repetitive element de-fragmentation and annotation visualization
 Depends: R (>= 3.4.0)
-biocViews:
-    Biostrings (>= 2.46.0),
-    TnT (>= 1.2.0),
-    GenomicFeatures (>= 1.30.0),
-    GenomicRanges (>= 1.30.0),
-    rtracklayer (>= 1.38.0),
-    systemPipeR (>= 1.12.0)
+biocViews: Infrastructure, Visualization
 Imports:
     dplyr,
     DT,
@@ -24,7 +18,13 @@ Imports:
     shiny,
     shinyjs,
     shinythemes,
-    stringr
+    stringr,
+    Biostrings (>= 2.46.0),
+    TnT (>= 1.2.0),
+    GenomicFeatures (>= 1.30.0),
+    GenomicRanges (>= 1.30.0),
+    rtracklayer (>= 1.38.0),
+    systemPipeR (>= 1.12.0)
 License: MIT
 Encoding: UTF-8
 LazyData: true
