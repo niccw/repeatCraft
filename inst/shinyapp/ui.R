@@ -11,6 +11,9 @@
 #' @importFrom shinyjs hidden
 NULL
 
+# manually load Tnt (should use import once TnT be available from bioconductor 3.8)
+require(TnT)
+
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(theme=shinythemes::shinytheme("yeti"),
 

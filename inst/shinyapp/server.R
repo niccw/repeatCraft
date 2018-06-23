@@ -9,6 +9,8 @@
 
 require(magrittr)
 require(ggplot2)
+# manually load Tnt (should use import once TnT be available from bioconductor 3.8)
+require(TnT)
 
 shinyServer(function(input, output,session) {
 
