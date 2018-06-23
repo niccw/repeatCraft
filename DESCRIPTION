@@ -19,9 +19,9 @@ Imports:
     shinyjs,
     shinythemes,
     stringr,
+    AnnotationDbi,
     Biostrings,
     GenomicFeatures,
-    GO.db,
     GenomicRanges,
     rtracklayer,
     systemPipeR
