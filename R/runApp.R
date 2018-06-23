@@ -12,7 +12,7 @@ runApp <- function() {
     stop("Could not find app directory. Try re-installing `repeatcraft`.", call. = FALSE)
   }
 
-  if(!require(TnT){
+  if(!require(TnT)){
     print("Installing package TnT...")
     source("https://bioconductor.org/biocLite.R")
     biocLite("TnT")
