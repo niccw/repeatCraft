@@ -3,7 +3,6 @@
 export(runApp)
 import(Biostrings)
 import(DT)
-import(GenomeInfoDb)
 import(GenomicFeatures)
 import(GenomicRanges)
 import(dplyr)
