@@ -21,7 +21,7 @@ Imports:
     stringr,
     Biostrings,
     GenomicFeatures,
-    GenomeInfoDbData,
+    GenomeInfoDb,
     GenomicRanges,
     rtracklayer,
     systemPipeR
