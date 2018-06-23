@@ -1,6 +1,6 @@
 require(shiny)
 
-#' @import shiny Biostrings DT dplyr magrittr plotly readr reshape2 shinythemes stringr
+#' @import shiny DT dplyr magrittr plotly readr reshape2 shinythemes stringr
 #' @importFrom Biostrings DNAStringSet substr
 #' @importFrom rtracklayer import.gff import.gff3 mcols start end export.gff3 
 #' @importFrom GenomicRanges seqnames GRanges makeGRangesFromDataFrame
