@@ -107,17 +107,3 @@ with open(rmgff,"r") as f:
 						col[8] = col[8] + "," + col[0] + "_g" + str(list(n.keys())[i])
 			print(*col,sep="\t")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
