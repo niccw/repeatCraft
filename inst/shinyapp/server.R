@@ -25,12 +25,14 @@ NULL
     checksample <- reactive({
         if(input$sampleset == "Hydra magnipappilata"){
         # read gff to GRanges
-          tegff <<- rtracklayer::import.gff(tegff_p)
-          ltrgff <<- rtracklayer::import.gff(ltrgff_p)
-          sgff <<- rtracklayer::import.gff(sgff_p)
-          rmgff <<- rtracklayer::import.gff(rmgff_p)
-          rmout <<- readr::read_table2(rmout_p,col_names = FALSE,skip = 3)
-          LTRlabel(TRUE)
+          #tegff <<- rtracklayer::import.gff(tegff_p)
+          #ltrgff <<- rtracklayer::import.gff(ltrgff_p)
+          #sgff <<- rtracklayer::import.gff(sgff_p)
+          #rmgff <<- rtracklayer::import.gff(rmgff_p)
+          #rmout <<- readr::read_table2(rmout_p,col_names = FALSE,skip = 3)
+          #mergermgff <<- import.gff3(mergermgff_p)
+          #LTRlabel(TRUE)
+          #fapath <- "hsym.fa"
         }
     })
 
@@ -158,6 +160,11 @@ NULL
         ltrcolor <<- ltrmapc[match(gff$LTRgroup,ltruniqV)]
       }
 
+      # mergermgfftrack color
+      mergeV <- unique(mergermgff$TEgroup)
+      mergec <- mapc(mergeV)
+      mergecolor <<- mergec[match(mergermgff$TEgroup,mergeV)]
+
   })
 
 
@@ -200,8 +207,8 @@ NULL
       validate(need(exists("rmgff"),""))
       tail(end(rmgff[GenomicRanges::seqnames(rmgff)==input$pchrom]),1)
     })
-    
-    
+
+
 
     output$plotstart <- renderUI({
       validate(need(exists("rmgff"),""))
@@ -441,8 +448,16 @@ NULL
           else if (as.integer(input$radio) == 2){
             rmftrack <- TnT::FeatureTrack(rmgff,tooltip = as.data.frame(rmgff), name=paste(rmgff$ID,":",rmgff$type), color = tecolor)
           }
-
         }
+
+        # Filter mergermgff (unknown)
+        if(input$showunknown == FALSE){
+          mergermgff_nounknown <- mergermgff[mergermgff$type != "Unknown"]
+          mergermgfftrack_nounknown <-  TnT::FeatureTrack(mergermgff_nounknown,tooltip = as.data.frame(mergermgff_nounknown), name=paste(mergermgff_nounknown$ID,":",mergermgff_nounknown$type), color = mergecolor)
+        }else{
+          mergermgfftrack <- TnT::FeatureTrack(mergermgff,tooltip = as.data.frame(mergermgff), name=paste(mergermgff$ID,":",mergermgff$type), color = mergecolor)
+        }
+
 
         # Only show track with TE
         trackls <<- c()
@@ -453,11 +468,12 @@ NULL
         }
 
         if(input$showunknown == FALSE){
-          checkrecord(rmgff_nounknown,rmftrack_nounknown)
-        }else{
-          checkrecord(rmgff,rmftrack)
-          
-        }
+           checkrecord(rmgff_nounknown,rmftrack_nounknown)
+           checkrecord(mergermgff_nounknown,mergermgfftrack_nounknown)
+         }else{
+           checkrecord(rmgff,rmftrack)
+           checkrecord(mergermgff,mergermgfftrack)
+         }
 
         if(!is.null(tegff)){
           checkrecord(tegff,teftrack)
@@ -654,7 +670,7 @@ NULL
         paste0(filechrom(),"_",filestart(),"_",fileend(),".fa")
       },
       content = function(file){
-        tigger::writeFasta(targetDNAstring,file,width=60) 
+        tigger::writeFasta(targetDNAstring,file,width=60)
       }
     )
 
@@ -675,5 +691,3 @@ NULL
     )
 
 })
-
-
