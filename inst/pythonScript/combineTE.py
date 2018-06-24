@@ -47,6 +47,7 @@ def update_pcol(c, label=""):
 
 
 print("##gff-version 3")
+print("##repeatcraft")
 with open(gff, "r") as f:
     for line in f:
         # If current TE is far away from the last TE
