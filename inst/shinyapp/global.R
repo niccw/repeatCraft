@@ -117,6 +117,17 @@ temergewrap <- function(inputpath,outinputpath,ltrinputpath,shortsize,gapsize,ma
       rmgff <<- rtracklayer::import.gff(parsedgff_b)
       dgff(TRUE)
     }
+  
+    showNotification("Step 5: Merge gff row according to TEgroup label", type ="message", duration = 3)
+    if(missltr){
+      temerge5 <- paste0("python3"," ",scriptdir,"trueMerge.py"," ",parsedgff," ",">",parsedgff_b)
+      system(temerge5)
+      mergermgff <<- import.gff(parsedgff_b)
+    }else{
+      temerge5 <- paste0("python3"," ",scriptdir,"trueMerge.py"," ",parsedgff_b," ",">",parsedgff )
+      system(temerge5)
+      mergermgff <<- import.gff(parsedgff)
+    }
 
   }
 }
