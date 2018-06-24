@@ -122,11 +122,11 @@ temergewrap <- function(inputpath,outinputpath,ltrinputpath,shortsize,gapsize,ma
     if(missltr){
       temerge5 <- paste0("python3"," ",scriptdir,"trueMerge.py"," ",parsedgff," ",">",parsedgff_b)
       system(temerge5)
-      mergermgff <<- import.gff(parsedgff_b)
+      mergermgff <<- rtracklayer::import.gff(parsedgff_b)
     }else{
       temerge5 <- paste0("python3"," ",scriptdir,"trueMerge.py"," ",parsedgff_b," ",">",parsedgff )
       system(temerge5)
-      mergermgff <<- import.gff(parsedgff)
+      mergermgff <<- rtracklayer::import.gff(parsedgff)
     }
 
   }
