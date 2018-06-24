@@ -60,19 +60,12 @@ temergewrap <- function(inputpath,outinputpath,ltrinputpath,shortsize,gapsize,ma
 
   gffsample <- readr::read_lines(inputpath,n_max=5)
   # Check repeatmasker.gff
-  if((startsWith(gffsample[2],"##gff-version 2")) & (startsWith(gffsample[3],"##date")) & (startsWith(gffsample[4],"##sequence"))){
+  if(!(startsWith(gffsample[3],"##repeatcraft"))){
     showNotification("Raw .gff from repeatmasker. Running TEmerger ...",type="message",duration=2)
-  }else{
-    # .gff from TEmerger
-    if(!startsWith(gffsample[3],"##")){
-      attr <- base::strsplit(gffsample[4],"\t")[9]
-      if(!grepl("Tstart",attr)){
-        # files is good to use
-        showNotification("repeatmasker .gff has already been reformatted, reading...",type="message",duration=3)
-        rmgff <<- rtracklayer::import.gff(inputpath)
-        return()
-      }
-    }
+  }
+  if(startsWith(gffsample[3],"##repeatcraft")){
+    showNotification("RepeatCraft.gff, reading...", type="message", duration=5)
+    return()
   }
 
   # make sure python3 is installed
