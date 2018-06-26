@@ -24,7 +24,8 @@ shinyUI(fluidPage(theme=shinythemes::shinytheme("yeti"),
       sidebarPanel(width=3,
         selectInput("sampleset","Sample Data:",c(" "),selected = " ", multiple = FALSE),
         hr(),
-        fileInput("rmgffu","Upload repeatmasker .gff", multiple = FALSE, accept = c(".gff")),
+        fileInput("rmgffu","Upload .gff", multiple = FALSE, accept = c(".gff")),
+        checkboxInput("rcgffb","GFF from RepeatCraft pipeline?",value = FALSE),
         fileInput("rmoutu","Upload repeatmasker .out", multiple = FALSE, accept = c(".out")),
         hr(),
         h4("Optional files:"),
@@ -34,13 +35,18 @@ shinyUI(fluidPage(theme=shinythemes::shinytheme("yeti"),
         shinyjs::hidden(
           div(id="mainoption",
               numericInput("shortsize","Short TEs size",value=100, min=1),
-              numericInput("gapsize","TE gap size",value=150, min=1))
+              numericInput("gapsize","TE gap size",value=150, min=1),
+              checkboxInput("loosemerge","Loose mode",value = FALSE))
         ),
         shinyjs::hidden(
           div(id="ltroption",
               numericInput("maxltrsize","Max. LTR size",value=10000,min=1),
               numericInput("ltrflanksize","LTR flank size",value=200,min=1),
               checkboxInput("mergeltr","merged gff",value=FALSE))
+        ),
+        shinyjs::hidden(
+          div(id="rcmerge",
+              fileInput("rcmerge","Merged GFF from RepeatCraft",multiple = FALSE,accept = c(".gff")))
         ),
         hr(),
         actionButton("upload","Upload",icon=icon("upload")),

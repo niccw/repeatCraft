@@ -47,10 +47,10 @@ NULL
       if(input$run == 0){
         return()
       }
-
+ 
       isolate({
         if((!is.null(input$rmgffu)&(!is.null(input$rmoutu)))){
-
+          print("inside checkupload")
           # Run temerger in background
           # Check if LTR.gff is uploaded
           if(!is.null(input$ltrgffu)){
@@ -58,11 +58,16 @@ NULL
           }else{
             ltrgffp <- input$ltrgffu$datapath
           }
-          #(inputpath,outinputpath,ltrinputpath,shortsize,gapsize,maxltrsize,ltrflanksize,mergeltr)
-          print(input$rmgffu$datapath)
-          temergewrap(input$rmgffu$datapath,input$rmoutu$datapath,ltrgffp,input$shortsize,input$gapsize,input$maxltrsize,input$ltrflanksize,input$mergeltr)
+
+          temergewrap(input$rmgffu$datapath,input$rmoutu$datapath,ltrgffp,input$shortsize,input$gapsize,input$maxltrsize,input$ltrflanksize,input$mergeltr,input$loosemerge)
 
           rmout <<- readr::read_table2(input$rmoutu$datapath,col_names = FALSE,skip = 3)
+         
+           if(!is.null(input$rcmerge)){
+            mergermgff <<- rtracklayer::import.gff3(input$rcmerge$datapath)
+          }else if (!runrc){
+            tntshowmerge <<- FALSE
+          }
 
           # Optional file
           if (!is.null(input$tegffu)){
@@ -161,9 +166,11 @@ NULL
       }
 
       # mergermgfftrack color
-      mergeV <- unique(mergermgff$TEgroup)
-      mergec <- mapc(mergeV)
-      mergecolor <<- mergec[match(mergermgff$TEgroup,mergeV)]
+      if(tntshowmerge){
+        mergeV <- unique(mergermgff$TEgroup)
+        mergec <- mapc(mergeV)
+        mergecolor <<- mergec[match(mergermgff$TEgroup,mergeV)]
+      }
 
   })
 
@@ -303,11 +310,23 @@ NULL
     observe({
       req(input$upload)
       print("after req upload")
-      shinyjs::show("mainoption")
-      if(!is.null(input$ltrgffu)){
-        shinyjs::show("ltroption")
+      if(!input$rcgffb){
+        shinyjs::show("mainoption")
+        if(!is.null(input$ltrgffu)){
+          shinyjs::show("ltroption")
+        }
+        shinyjs::show("run")
       }
-      shinyjs::show("run")
+    })
+    
+    # Upload output
+    observe({
+      req(input$upload)
+      print("upload output")
+      if(input$rcgffb){
+        shinyjs::show("rcmerge")
+        shinyjs::show("run")
+      }
     })
 
 
@@ -450,12 +469,14 @@ NULL
           }
         }
 
-        # Filter mergermgff (unknown)
-        if(input$showunknown == FALSE){
-          mergermgff_nounknown <- mergermgff[mergermgff$type != "Unknown"]
-          mergermgfftrack_nounknown <-  TnT::FeatureTrack(mergermgff_nounknown,tooltip = as.data.frame(mergermgff_nounknown), name=paste(mergermgff_nounknown$ID,":",mergermgff_nounknown$type), color = mergecolor)
-        }else{
-          mergermgfftrack <- TnT::FeatureTrack(mergermgff,tooltip = as.data.frame(mergermgff), name=paste(mergermgff$ID,":",mergermgff$type), color = mergecolor)
+        # Filter mergermgff 
+        if(tntshowmerge){
+          if(input$showunknown == FALSE){
+            mergermgff_nounknown <- mergermgff[mergermgff$type != "Unknown"]
+            mergermgfftrack_nounknown <-  TnT::FeatureTrack(mergermgff_nounknown,tooltip = as.data.frame(mergermgff_nounknown), name=paste(mergermgff_nounknown$ID,":",mergermgff_nounknown$type), color = mergecolor)
+          }else{
+            mergermgfftrack <- TnT::FeatureTrack(mergermgff,tooltip = as.data.frame(mergermgff), name=paste(mergermgff$ID,":",mergermgff$type), color = mergecolor)
+          }
         }
 
 
@@ -469,10 +490,14 @@ NULL
 
         if(input$showunknown == FALSE){
            checkrecord(rmgff_nounknown,rmftrack_nounknown)
-           checkrecord(mergermgff_nounknown,mergermgfftrack_nounknown)
+          if(tntshowmerge){
+            checkrecord(mergermgff_nounknown,mergermgfftrack_nounknown)
+          }
          }else{
            checkrecord(rmgff,rmftrack)
+           if(tntshowmerge){
            checkrecord(mergermgff,mergermgfftrack)
+           }
          }
 
         if(!is.null(tegff)){
@@ -683,10 +708,14 @@ NULL
         clean2 <- paste0("rm -r"," ",parsedgff_b)
         clean3 <- paste0("rm -r"," ",fuseltrgff)
         clean4 <- paste0("rm -r"," ",fuseltrgff_b)
+        clean5 <- paste0("rm -r"," ",tobesort_label)
+        clean6 <- paste0("rm -r"," ",tobesort_merge)
         system(clean1)
         system(clean2)
         system(clean3)
         system(clean4)
+        system(clean5)
+        system(clean6)
       }
     )
 
